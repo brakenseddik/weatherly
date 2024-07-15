@@ -20,20 +20,25 @@ To use Weatherly, you need to have Flutter installed on your machine. For detail
 
 Add the following dependency to your `pubspec.yaml` file:
 
+This package has not been published yet, so it is available via Github only on [Github Package link](https://github.com/brakenseddik/weatherly)
 ```yaml
 dependencies:
-  weatherly: ^1.0.0
+  weatherly:
+    git:
+      url: https://github.com/brakenseddik/weatherly.git
 ```
 Then, run dart pub get to install the package.
 
 ### Basic Usage
 Here's a basic example of how to use the Weatherly package in your Flutter application.
+Use [WeatherAPI](https://www.weatherapi.com/ to generate a free API Key
 
 Import the Package
 ```
 import 'package:weatherly/weatherly.dart';
 ```
 Then make this small widget
+Don't forget to replace with your own API key
 
 ```
 import 'package:flutter/material.dart';
