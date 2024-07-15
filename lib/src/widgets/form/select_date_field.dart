@@ -8,8 +8,13 @@ class WeatherDatePickerField extends StatelessWidget {
     this.dateInputDecoration,
   }) : _dateController = dateController;
 
+  /// Controller for managing the text input and state of the date field.
   final TextEditingController _dateController;
+
+  /// Callback function invoked when the date input field is tapped.
   final void Function()? onDateTapped;
+
+  /// Decoration configuration for the date input field.
   final InputDecoration? dateInputDecoration;
 
   @override

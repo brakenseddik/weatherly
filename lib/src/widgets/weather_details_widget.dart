@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weatherly/src/models/temperature_unit.dart';
 import 'package:weatherly/src/services/utils.dart';
+import 'package:weatherly/src/services/weather_config.dart';
 import 'package:weatherly/src/widgets/weather_card.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/models/weather_data.dart';
@@ -62,6 +63,7 @@ class WeatherlyDetailsWidget extends StatefulWidget {
   /// Widget to show for the leading suggestion list tile
   final Widget? searchTileLeading;
 
+  /// A function to be executed when something wrong e.g no internet while fetching weather details
   final Function(WeatherlyError)? onError;
 
   @override
@@ -79,7 +81,7 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
 
   DateTime? _selectedDate;
   Location? _selectedLocation;
-  TemperatureUnit? _selectedUnit;
+  TemperatureUnit _selectedUnit = WeatherlyConfig().temperatureUnit;
 
   @override
   void initState() {
@@ -130,7 +132,7 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
                   },
                   onUnitChanged: (TemperatureUnit? unit) {
                     setState(() {
-                      _selectedUnit = unit;
+                      _selectedUnit = unit!;
                     });
                   },
                   onSubmit: (_selectedLocation == null || _selectedUnit == null)
@@ -182,7 +184,8 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
     }
   }
 
-  displayError(WeatherlyError? weatherError) {
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> displayError(
+      WeatherlyError? weatherError) {
     return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.redAccent,
         content: Text(weatherError?.message ?? 'Something went wrong!!')));

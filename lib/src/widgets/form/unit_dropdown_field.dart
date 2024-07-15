@@ -8,7 +8,10 @@ class UnitsDropDownField extends StatelessWidget {
     this.dateInputDecoration,
   });
 
+  /// Callback function invoked when the temperature unit dropdown changes.
   final void Function(TemperatureUnit?)? onUnitChanged;
+
+  /// Decoration configuration for the date input field.
   final InputDecoration? dateInputDecoration;
 
   @override

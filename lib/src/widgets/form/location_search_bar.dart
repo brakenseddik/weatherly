@@ -14,11 +14,22 @@ class LocationSearchBar extends StatelessWidget {
     this.searchTileLeading,
   });
 
+  /// Callback function invoked when a location suggestion is selected.
   final Function(Location suggestion)? onLocationSelected;
+
+  /// Callback function invoked when the location input changes.
   final Function(String?)? onLocationChanged;
+
+  /// Asynchronous callback to fetch location suggestions based on user input.
   final Future<List<Location>> Function(String) suggestionsCallback;
+
+  /// Controller for managing the text input and state of the location field.
   final TextEditingController locationController;
+
+  /// Decoration configuration for the search input field.
   final InputDecoration? searchFieldInputDecoration;
+
+  /// Leading widget displayed in each suggestion tile within the search results.
   final Widget? searchTileLeading;
 
   @override

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 
 class SubmitFormButton extends StatelessWidget {
-  final ButtonStyle? submitButtonStyle;
-  final void Function()? onSubmit;
-  final Widget? submitButtonChild;
   const SubmitFormButton({
     super.key,
     this.submitButtonStyle,
     this.onSubmit,
     this.submitButtonChild,
   });
+
+  /// Style configuration for the submit button.
+  final ButtonStyle? submitButtonStyle;
+
+  /// Callback function invoked when the form is submitted.
+  final void Function()? onSubmit;
+
+  /// The widget displayed as the child of the submit button.
+  final Widget? submitButtonChild;
 
   @override
   Widget build(BuildContext context) {

@@ -19,16 +19,34 @@ class ShowWeatherWidget extends StatelessWidget {
     this.temperatureUnit,
   });
 
+  /// Holds weather information data fetched from an weather service.
   final WeatherlyData? weatherInfo;
+
+  /// Represents an error that occurred while fetching weather information.
   final WeatherlyError? weatherError;
 
+  /// Defines the text style for displaying dates in the weather details widget.
   final TextStyle? dateStyle;
+
+  /// Defines the text style for displaying temperature in the weather details widget.
   final TextStyle? temperatureStyle;
+
+  /// Defines the text style for displaying weather conditions in the weather details widget.
   final TextStyle? conditionStyle;
+
+  /// Specifies the background color for the weather details container.
   final Color? containerColor;
+
+  /// Defines the padding around the weather details widget.
   final EdgeInsetsGeometry? padding;
+
+  /// Specifies the size of icons used in the weather details widget.
   final double? iconSize;
+
+  /// Defines the border radius for the weather details container.
   final BorderRadiusGeometry? borderRadius;
+
+  /// Represents the unit used for displaying temperatures (e.g., Celsius or Fahrenheit).
   final TemperatureUnit? temperatureUnit;
 
   @override

@@ -6,8 +6,28 @@ import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/services/weather_config.dart';
 
+/// A service class that provides weather-related functionalities.
+///
+/// The `WeatherlyService` class is responsible for interacting with an external
+/// weather API to fetch weather data, location suggestions.
+/// This class abstracts the API calls and provides methods for
+/// retrieving weather details and location suggestions based on user input.
+///
+/// Example usage:
+/// ```dart
+/// WeatherlyService weatherService = WeatherlyService();
+///
+/// // Fetch weather information
+/// WeatherlyData weatherData = await weatherService.getWeather(lon, lat, date);
+///
+/// // Fetch location suggestions
+/// List<Location> suggestions = await weatherService.fetchSuggestions(query);
+/// ```
 class WeatherlyService {
+  ///[Dio] handles http requests with the weather api endpoint
   late Dio _dio;
+
+  /// An api key is essential to interact with the weather api
   late String _apiKey;
   WeatherlyService({Dio? dio, WeatherlyConfig? weatherlyConfig}) {
     _dio = dio ??
@@ -18,9 +38,9 @@ class WeatherlyService {
     _apiKey = weatherlyConfig?.apiKey ?? WeatherlyConfig().apiKey;
   }
 
-  /// Fetches the current weather data based on a geographical location (name or coordinates).
+  /// Fetches the current weather data based on a geographical location (coordinates).
   ///
-  /// [location] can be either a place name (String) or geo coordinates (latitude and longitude as String).
+  /// [location] represents the latitude and longitude of a given location
   Future<WeatherlyData?> getCurrentWeather(double long, double lat) async {
     try {
       final response = await _dio.get(
@@ -43,8 +63,9 @@ class WeatherlyService {
 
   /// Fetches weather data for a specific date based on a geographical location.
   ///
-  /// [location] can be either a place name (String) or geo coordinates (latitude and longitude as String).
+  /// [location] isa  geo coordinates (latitude and longitude as String).
   /// [date] is the date for which the weather data is requested.
+  /// It can be for [current], [historical] or [future] forecast.
   Future<WeatherlyData?> getWeather(
       double long, double lat, DateTime date) async {
     try {
@@ -71,7 +92,7 @@ class WeatherlyService {
 
   /// Fetches a weather forecast for a specific number of days (up to 10) based on a geographical location.
   ///
-  /// [location] can be either a place name (String) or geo coordinates (latitude and longitude as String).
+  /// [location] ia s geo coordinates (latitude and longitude as String).
   /// [days] is the number of days for which the forecast is requested (max: 10).
   Future<WeatherlyData?> getForecast(double long, double lat, int days) async {
     if (days > 10) {
@@ -112,8 +133,6 @@ class WeatherlyService {
             .map((data) => Location.fromJson(data))
             .toList();
         return suggestions;
-      } else {
-        return [];
       }
     } on DioException catch (error) {
       getDioException(error);

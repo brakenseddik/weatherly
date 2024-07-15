@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:weatherly/src/models/weather_data.dart';
 
 class SuggestionListItem extends StatelessWidget {
-  final Location suggestion;
-  final Widget? leading;
-
   const SuggestionListItem({
     super.key,
     required this.suggestion,
     this.leading,
   });
+
+  /// Represents a location suggestion item to display it in the ListTile.
+  final Location suggestion;
+
+  /// Leading widget displayed in the suggestion list tile.
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
