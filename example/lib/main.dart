@@ -1,10 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:weatherly/weatherly.dart';
 
 void main() {
-  WeatherlyConfig().initialize('9270c145786e45c0ab3141941241307');
+  WeatherlyConfig().initialize('ENTER_YOUR_KEY_HERE');
   runApp(const MyApp());
 }
 

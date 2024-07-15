@@ -182,8 +182,7 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
     }
   }
 
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> displayError(
-      WeatherlyError? weatherError) {
+  displayError(WeatherlyError? weatherError) {
     return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.redAccent,
         content: Text(weatherError?.message ?? 'Something went wrong!!')));

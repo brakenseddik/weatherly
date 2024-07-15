@@ -16,7 +16,8 @@ know whether this package might be useful for them.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Fetch weather data from an endpoint
+- Shows a widget that takes as a parameter [Location] and [Date]
 
 ## Getting started
 

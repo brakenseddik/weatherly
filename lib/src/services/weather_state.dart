@@ -4,66 +4,64 @@ import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/services/weather_service.dart';
 
-class WeatherState extends ChangeNotifier {
-  final WeatherlyService weatherApi;
+class WeatherProvider with ChangeNotifier {
+  TextEditingController locationController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
   WeatherlyData? weatherInfo;
   WeatherlyError? weatherError;
   DateTime? selectedDate;
   Location? selectedLocation;
   TemperatureUnit? selectedUnit;
-  List<Location> suggestions = [];
-  bool isLoading = false;
+  final GlobalKey<FormState> formKey = GlobalKey();
 
-  WeatherState({required this.weatherApi});
-
-  Future<void> fetchSuggestions(String pattern) async {
-    if (pattern.isNotEmpty) {
-      isLoading = true;
-      notifyListeners();
-      try {
-        suggestions = await weatherApi.fetchSuggestions(pattern);
-      } catch (e) {
-        weatherError = WeatherlyError.getError(e);
-      } finally {
-        isLoading = false;
-        notifyListeners();
-      }
-    }
-  }
-
-  Future<void> getWeather(Location location, DateTime date) async {
-    isLoading = true;
-    notifyListeners();
-    try {
-      weatherInfo =
-          await weatherApi.getWeather(location.lon!, location.lat!, date);
-      weatherError = null;
-    } catch (e) {
-      weatherError = WeatherlyError.getError(e);
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  void updateSelectedLocation(Location? location) {
+  void setLocation(Location? location) {
     selectedLocation = location;
     notifyListeners();
   }
 
-  void updateSelectedDate(DateTime date) {
+  void setDate(DateTime? date) {
     selectedDate = date;
+    dateController.text = date.toString();
     notifyListeners();
   }
 
-  void updateSelectedUnit(TemperatureUnit unit) {
+  void setUnit(TemperatureUnit? unit) {
     selectedUnit = unit;
     notifyListeners();
   }
 
-  void clearWeatherData() {
-    weatherInfo = null;
-    weatherError = null;
+  void setWeatherInfo(WeatherlyData? info) {
+    weatherInfo = info;
     notifyListeners();
+  }
+
+  void setError(WeatherlyError? error) {
+    weatherError = error;
+    notifyListeners();
+  }
+
+  Future<void> getWeather(Location location, DateTime date) async {
+    try {
+      final res = await WeatherlyService().getWeather(
+        location.lon!,
+        location.lat!,
+        date,
+      );
+      setWeatherInfo(res);
+    } catch (e) {
+      setError(WeatherlyError.getError(e));
+    }
+  }
+
+  Future<List<Location>> fetchSuggestions(String pattern) async {
+    if (pattern.isNotEmpty) {
+      try {
+        return await WeatherlyService().fetchSuggestions(pattern);
+      } catch (e) {
+        setError(WeatherlyError.getError(e));
+        return [];
+      }
+    }
+    return [];
   }
 }
