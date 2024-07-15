@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:weatherly/weatherly.dart';
 
@@ -25,7 +27,7 @@ class WeatherSearchPage extends StatefulWidget {
 }
 
 class _WeatherSearchPageState extends State<WeatherSearchPage> {
-  final WeatherApi weatherApi = WeatherApi();
+  final WeatherlyService weatherApi = WeatherlyService();
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +35,26 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
       appBar: AppBar(
         title: const Text('Weather Search'),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              WeatherDetailsWidget(),
+              const WeatherlyDetailsWidget(),
+              ElevatedButton(
+                  onPressed: () async {
+                    final weatherData =
+                        await weatherApi.getForecast(-12.24, 54.11, 10);
+                    print("weatherData: $weatherData");
+                  },
+                  child: const Text('Get forecast')),
+              ElevatedButton(
+                  onPressed: () async {
+                    final weatherData =
+                        await weatherApi.getCurrentWeather(-12.24, 54.11);
+                    print("Current weather: $weatherData");
+                  },
+                  child: const Text('Get current weather')),
             ],
           ),
         ),

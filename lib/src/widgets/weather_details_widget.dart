@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weatherly/src/models/temperature_unit.dart';
@@ -10,8 +8,8 @@ import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/widgets/weather_search_form.dart';
 import 'package:weatherly/src/services/weather_service.dart';
 
-class WeatherDetailsWidget extends StatefulWidget {
-  const WeatherDetailsWidget({
+class WeatherlyDetailsWidget extends StatefulWidget {
+  const WeatherlyDetailsWidget({
     super.key,
     this.searchFieldInputDecoration,
     this.dateInputDecoration,
@@ -24,6 +22,8 @@ class WeatherDetailsWidget extends StatefulWidget {
     this.iconSize,
     this.borderRadius,
     this.submitButtonChild,
+    this.onError,
+    this.searchTileLeading,
   });
 
   /// InputDecoration for the search input text field
@@ -43,24 +43,39 @@ class WeatherDetailsWidget extends StatefulWidget {
 
   /// weather condition text style
   final TextStyle? conditionStyle;
+
+  /// Background color for result card
   final Color? containerColor;
+
+  /// Padding for the widget
   final EdgeInsetsGeometry? padding;
+
+  /// icon size
   final double? iconSize;
+
+  /// Details card border radius
   final BorderRadiusGeometry? borderRadius;
+
+  /// Widget to show in the submit button
   final Widget? submitButtonChild;
 
+  /// Widget to show for the leading suggestion list tile
+  final Widget? searchTileLeading;
+
+  final Function(WeatherError)? onError;
+
   @override
-  State<WeatherDetailsWidget> createState() => _WeatherDetailsWidgetState();
+  State<WeatherlyDetailsWidget> createState() => _WeatherlyDetailsWidgetState();
 }
 
-class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
+class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
   late final TextEditingController _locationController;
   late final TextEditingController _dateController;
   final _formKey = GlobalKey<FormState>();
 
   WeatherData? weatherInfo;
   WeatherError? weatherError;
-  late WeatherApi _apiService;
+  late WeatherlyService _apiService;
 
   DateTime? _selectedDate;
   Location? _selectedLocation;
@@ -70,7 +85,7 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
   @override
   void initState() {
     super.initState();
-    _apiService = WeatherApi();
+    _apiService = WeatherlyService();
     _locationController = TextEditingController();
     _dateController = TextEditingController();
   }
@@ -89,6 +104,7 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
                   formKey: _formKey,
                   locationController: _locationController,
                   dateController: _dateController,
+                  searchTileLeading: widget.searchTileLeading,
                   onLocationSelected: (Location suggestion) {
                     setState(() {
                       _locationController.text = suggestion.name ?? '';
@@ -101,7 +117,6 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
                     });
                   },
                   suggestionsCallback: (String pattern) async {
-                    log('Pattern: $pattern');
                     return suggestionCallback(pattern);
                   },
                   onDateTapped: () async {
@@ -153,11 +168,13 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
         });
       } catch (e) {
         final weatherError = WeatherError.getError(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              backgroundColor: Colors.redAccent,
-              content: Text(weatherError.message ?? 'Something went wrong!!')),
-        );
+        widget.onError ??
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  backgroundColor: Colors.redAccent,
+                  content:
+                      Text(weatherError.message ?? 'Something went wrong!!')),
+            );
       }
     }
   }
@@ -178,11 +195,20 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
       setState(() {
         weatherError = WeatherError.getError(e);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            backgroundColor: Colors.redAccent,
-            content: Text(weatherError!.message ?? 'Something went wrong!!')),
-      );
+      widget.onError ??
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                backgroundColor: Colors.redAccent,
+                content:
+                    Text(weatherError!.message ?? 'Something went wrong!!')),
+          );
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _dateController.clear();
+    _locationController.clear();
   }
 }

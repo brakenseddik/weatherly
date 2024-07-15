@@ -15,20 +15,21 @@ class UnitsDropDownField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: DropdownButtonFormField<TemperatureUnit>(
-          decoration: dateInputDecoration ??
-              const InputDecoration(
-                labelText: 'Unit',
-                border: OutlineInputBorder(),
-                fillColor: Colors.white,
-                filled: true,
-              ),
-          items: TemperatureUnit.values
-              .map((e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(e.displayName),
-                  ))
-              .toList(),
-          onChanged: onUnitChanged),
+        decoration: dateInputDecoration ??
+            const InputDecoration(
+              labelText: 'Unit',
+              border: OutlineInputBorder(),
+              fillColor: Colors.white,
+              filled: true,
+            ),
+        items: TemperatureUnit.values
+            .map((e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(e.displayName),
+                ))
+            .toList(),
+        onChanged: onUnitChanged,
+      ),
     );
   }
 }

@@ -8,13 +8,13 @@ import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/services/weather_config.dart';
 
-class WeatherApi {
+class WeatherlyService {
   late Dio _dio;
   late String _apiKey;
 
-  WeatherApi() {
-    _dio = Dio(Constants.dioOptions);
-    _apiKey = WeatherlyConfig().apiKey;
+  WeatherlyService({Dio? dio, WeatherlyConfig? weatherlyConfig}) {
+    _dio = dio ?? Dio(Constants.dioOptions);
+    _apiKey = weatherlyConfig?.apiKey ?? WeatherlyConfig().apiKey;
   }
 
   /// Fetches the current weather data based on a geographical location (name or coordinates).
@@ -33,7 +33,7 @@ class WeatherApi {
         return WeatherData.fromJson(response.data);
       }
     } on DioException catch (error) {
-      _getDioException(error);
+      getDioException(error);
     } catch (error) {
       throw UnknownException('Failed to get current weather data: $error');
     }
@@ -61,7 +61,7 @@ class WeatherApi {
         return WeatherData.fromJson(response.data);
       }
     } on DioException catch (error) {
-      _getDioException(error);
+      getDioException(error);
     } catch (error) {
       throw UnknownException('Failed to get weather data: $error');
     }
@@ -82,7 +82,7 @@ class WeatherApi {
         '/forecast.json',
         queryParameters: {
           'key': _apiKey,
-          'q': '$long,$lat',
+          'q': '$lat,$long',
           'days': days,
         },
       );
@@ -90,7 +90,7 @@ class WeatherApi {
         return WeatherData.fromJson(response.data);
       }
     } on DioException catch (error) {
-      _getDioException(error);
+      getDioException(error);
     } catch (error) {
       throw UnknownException('Failed to get forecast data: $error');
     }
@@ -115,30 +115,11 @@ class WeatherApi {
         return [];
       }
     } on DioException catch (error) {
-      _getDioException(error);
+      getDioException(error);
     } catch (error) {
       throw UnknownException('Failed to get suggestions: $error');
     }
     return [];
-  }
-
-  /// Classifies and throws custom exceptions based on DioException type.
-  void _getDioException(DioException error) {
-    log('exception is:$error');
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        throw TimeoutException(error.message);
-      case DioExceptionType.badCertificate:
-      case DioExceptionType.cancel:
-      case DioExceptionType.connectionError:
-        throw ServerException('Connection Exception: ${error.message}');
-      case DioExceptionType.badResponse:
-        throw ClientException(error.response?.data);
-      case DioExceptionType.unknown:
-        throw UnknownException('Failed to get weather data: ${error.response}');
-    }
   }
 
   /// Returns the appropriate API endpoint based on the date.
@@ -152,7 +133,7 @@ class WeatherApi {
     } else if (date.isAfter(now.add(const Duration(days: 14)))) {
       return 'future'; // Future data
     } else {
-      return 'forecast'; // Current weather + 10 days forecast
+      return 'forecast'; // Current weather + 14 days forecast
     }
   }
 }

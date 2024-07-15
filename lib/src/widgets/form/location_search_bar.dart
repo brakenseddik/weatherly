@@ -11,6 +11,7 @@ class LocationSearchBar extends StatelessWidget {
     required this.suggestionsCallback,
     required this.locationController,
     this.searchFieldInputDecoration,
+    this.searchTileLeading,
   });
 
   final Function(Location suggestion)? onLocationSelected;
@@ -18,6 +19,7 @@ class LocationSearchBar extends StatelessWidget {
   final Future<List<Location>> Function(String) suggestionsCallback;
   final TextEditingController locationController;
   final InputDecoration? searchFieldInputDecoration;
+  final Widget? searchTileLeading;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,10 @@ class LocationSearchBar extends StatelessWidget {
       },
       suggestionsCallback: suggestionsCallback,
       itemBuilder: (context, Location suggestion) {
-        return SuggestionListItem(suggestion: suggestion);
+        return SuggestionListItem(
+          suggestion: suggestion,
+          leading: searchTileLeading,
+        );
       },
       onSelected: onLocationSelected,
     );

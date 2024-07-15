@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weatherly/src/models/temperature_unit.dart';
 import 'package:weatherly/src/models/weather_data.dart';
+import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/widgets/form/location_search_bar.dart';
 import 'package:weatherly/src/widgets/form/unit_dropdown_field.dart';
 import 'package:weatherly/src/widgets/form/submit_button.dart';
@@ -21,6 +22,7 @@ class WeatherSearchForm extends StatelessWidget {
   final TextEditingController dateController;
   final TextEditingController locationController;
   final GlobalKey formKey;
+  final Widget? searchTileLeading;
 
   const WeatherSearchForm({
     super.key,
@@ -38,6 +40,7 @@ class WeatherSearchForm extends StatelessWidget {
     this.spaceBetweenField,
     this.submitButtonChild,
     required this.formKey,
+    this.searchTileLeading,
   });
 
   @override
@@ -47,11 +50,13 @@ class WeatherSearchForm extends StatelessWidget {
       child: Column(
         children: [
           LocationSearchBar(
-              suggestionsCallback: suggestionsCallback,
-              locationController: locationController,
-              onLocationChanged: onLocationChanged,
-              onLocationSelected: onLocationSelected,
-              searchFieldInputDecoration: searchFieldInputDecoration),
+            suggestionsCallback: suggestionsCallback,
+            locationController: locationController,
+            onLocationChanged: onLocationChanged,
+            onLocationSelected: onLocationSelected,
+            searchFieldInputDecoration: searchFieldInputDecoration,
+            searchTileLeading: searchTileLeading,
+          ),
           SizedBox(height: spaceBetweenField ?? 16.0),
           Row(
             children: [

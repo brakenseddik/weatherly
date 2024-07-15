@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
+
 class ServerException implements Exception {
   final dynamic message;
 
@@ -14,6 +18,24 @@ class UnknownException implements Exception {
   final dynamic message;
 
   UnknownException(this.message);
+}
+
+/// Classifies and throws custom exceptions based on DioException type.
+void getDioException(DioException error) {
+  switch (error.type) {
+    case DioExceptionType.connectionTimeout:
+    case DioExceptionType.sendTimeout:
+    case DioExceptionType.receiveTimeout:
+      throw TimeoutException(error.message);
+    case DioExceptionType.badCertificate:
+    case DioExceptionType.cancel:
+    case DioExceptionType.connectionError:
+      throw ServerException('Connection Exception: ${error.message}');
+    case DioExceptionType.badResponse:
+      throw ClientException(error.response?.data);
+    case DioExceptionType.unknown:
+      throw UnknownException('Failed to get weather data: ${error.response}');
+  }
 }
 
 class WeatherError {

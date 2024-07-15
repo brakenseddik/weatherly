@@ -16,7 +16,7 @@ class WeatherlyConfig {
   String get apiKey {
     if (_apiKey == null) {
       throw Exception(
-          'API key has not been initialized. Call AppConfig().initialize(apiKey) in main.dart');
+          'API key has not been initialized. Call WeatherlyConfig().initialize(apiKey) in main.dart');
     }
     return _apiKey!;
   }
