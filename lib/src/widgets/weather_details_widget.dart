@@ -62,7 +62,7 @@ class WeatherlyDetailsWidget extends StatefulWidget {
   /// Widget to show for the leading suggestion list tile
   final Widget? searchTileLeading;
 
-  final Function(WeatherError)? onError;
+  final Function(WeatherlyError)? onError;
 
   @override
   State<WeatherlyDetailsWidget> createState() => _WeatherlyDetailsWidgetState();
@@ -73,14 +73,13 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
   late final TextEditingController _dateController;
   final _formKey = GlobalKey<FormState>();
 
-  WeatherData? weatherInfo;
-  WeatherError? weatherError;
+  WeatherlyData? weatherInfo;
+  WeatherlyError? weatherError;
   late WeatherlyService _apiService;
 
   DateTime? _selectedDate;
   Location? _selectedLocation;
   TemperatureUnit? _selectedUnit;
-  List<Location> _suggestions = [];
 
   @override
   void initState() {
@@ -117,7 +116,7 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
                     });
                   },
                   suggestionsCallback: (String pattern) async {
-                    return suggestionCallback(pattern);
+                    return _fetchSuggestions(pattern);
                   },
                   onDateTapped: () async {
                     final pickedDate = await showDatePickerDialog(context);
@@ -159,29 +158,16 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
     );
   }
 
-  Future<void> _fetchSuggestions(String pattern) async {
+  Future<List<Location>> _fetchSuggestions(String pattern) async {
     if (pattern.isNotEmpty) {
       try {
-        final results = await _apiService.fetchSuggestions(pattern);
-        setState(() {
-          _suggestions = results;
-        });
+        return await _apiService.fetchSuggestions(pattern);
       } catch (e) {
-        final weatherError = WeatherError.getError(e);
-        widget.onError ??
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  backgroundColor: Colors.redAccent,
-                  content:
-                      Text(weatherError.message ?? 'Something went wrong!!')),
-            );
+        widget.onError ?? displayError(WeatherlyError.getError(e));
+        return [];
       }
     }
-  }
-
-  Future<List<Location>> suggestionCallback(pattern) async {
-    await _fetchSuggestions(pattern);
-    return _suggestions;
+    return [];
   }
 
   Future getWeather(Location location, DateTime date) async {
@@ -192,17 +178,15 @@ class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
         weatherInfo = res;
       });
     } catch (e) {
-      setState(() {
-        weatherError = WeatherError.getError(e);
-      });
-      widget.onError ??
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                backgroundColor: Colors.redAccent,
-                content:
-                    Text(weatherError!.message ?? 'Something went wrong!!')),
-          );
+      widget.onError ?? displayError(WeatherlyError.getError(e));
     }
+  }
+
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> displayError(
+      WeatherlyError? weatherError) {
+    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text(weatherError?.message ?? 'Something went wrong!!')));
   }
 
   @override

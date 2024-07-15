@@ -48,7 +48,7 @@ void main() {
       final weatherData =
           await weatherlyService.getCurrentWeather(longitude, latitude);
 
-      expect(weatherData, isA<WeatherData?>());
+      expect(weatherData, isA<WeatherlyData?>());
     });
 
     test('fetches weather data for a specific date successfully', () async {
@@ -68,7 +68,7 @@ void main() {
         date,
       );
 
-      expect(weatherData, isA<WeatherData>());
+      expect(weatherData, isA<WeatherlyData>());
     });
 
     test('fetches forecast data successfully', () async {
@@ -88,7 +88,7 @@ void main() {
         days,
       );
 
-      expect(weatherData, isA<WeatherData>());
+      expect(weatherData, isA<WeatherlyData>());
     });
 
     test('fetches location suggestions successfully', () async {

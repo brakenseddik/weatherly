@@ -19,8 +19,8 @@ class ShowWeatherWidget extends StatelessWidget {
     this.temperatureUnit,
   });
 
-  final WeatherData? weatherInfo;
-  final WeatherError? weatherError;
+  final WeatherlyData? weatherInfo;
+  final WeatherlyError? weatherError;
 
   final TextStyle? dateStyle;
   final TextStyle? temperatureStyle;
@@ -48,9 +48,9 @@ class ShowWeatherWidget extends StatelessWidget {
       width: 450,
       padding: padding ?? const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        borderRadius: borderRadius ?? BorderRadius.circular(6),
-        color: containerColor ?? Colors.amber.shade200,
-      ),
+          borderRadius: borderRadius ?? BorderRadius.circular(6),
+          color: containerColor ?? Colors.white,
+          boxShadow: const [BoxShadow(blurRadius: 0.8, spreadRadius: 0.7)]),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -112,5 +112,21 @@ class ShowWeatherWidget extends StatelessWidget {
     final currentIcon = weatherInfo?.current?.condition?.icon;
     final icon = forecastIcon ?? currentIcon;
     return icon != null ? 'http:$icon' : null;
+  }
+
+  String formatTemperature({
+    required double? temperature,
+    required TemperatureUnit temperatureUnit,
+  }) {
+    if (temperature == null) {
+      return 'N/A';
+    }
+
+    switch (temperatureUnit) {
+      case TemperatureUnit.fahrenheit:
+        return '${temperature.toStringAsFixed(1)}°F';
+      case TemperatureUnit.celsius:
+        return '${temperature.toStringAsFixed(1)}°C';
+    }
   }
 }

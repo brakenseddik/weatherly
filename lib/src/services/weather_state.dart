@@ -6,8 +6,8 @@ import 'package:weatherly/src/services/weather_service.dart';
 
 class WeatherState extends ChangeNotifier {
   final WeatherlyService weatherApi;
-  WeatherData? weatherInfo;
-  WeatherError? weatherError;
+  WeatherlyData? weatherInfo;
+  WeatherlyError? weatherError;
   DateTime? selectedDate;
   Location? selectedLocation;
   TemperatureUnit? selectedUnit;
@@ -23,7 +23,7 @@ class WeatherState extends ChangeNotifier {
       try {
         suggestions = await weatherApi.fetchSuggestions(pattern);
       } catch (e) {
-        weatherError = WeatherError.getError(e);
+        weatherError = WeatherlyError.getError(e);
       } finally {
         isLoading = false;
         notifyListeners();
@@ -39,7 +39,7 @@ class WeatherState extends ChangeNotifier {
           await weatherApi.getWeather(location.lon!, location.lat!, date);
       weatherError = null;
     } catch (e) {
-      weatherError = WeatherError.getError(e);
+      weatherError = WeatherlyError.getError(e);
     } finally {
       isLoading = false;
       notifyListeners();

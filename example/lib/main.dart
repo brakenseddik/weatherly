@@ -41,20 +41,26 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
           child: Column(
             children: [
               const WeatherlyDetailsWidget(),
-              ElevatedButton(
-                  onPressed: () async {
-                    final weatherData =
-                        await weatherApi.getForecast(-12.24, 54.11, 10);
-                    print("weatherData: $weatherData");
-                  },
-                  child: const Text('Get forecast')),
-              ElevatedButton(
-                  onPressed: () async {
-                    final weatherData =
-                        await weatherApi.getCurrentWeather(-12.24, 54.11);
-                    print("Current weather: $weatherData");
-                  },
-                  child: const Text('Get current weather')),
+              SizedBox(
+                width: 350,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      final weatherData =
+                          await weatherApi.getForecast(-12.24, 54.11, 10);
+                      print("weatherData: $weatherData");
+                    },
+                    child: const Text('Get forecast')),
+              ),
+              SizedBox(
+                width: 350,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      final weatherData =
+                          await weatherApi.getCurrentWeather(-12.24, 54.11);
+                      print("Current weather: $weatherData");
+                    },
+                    child: const Text('Get current weather')),
+              ),
             ],
           ),
         ),

@@ -38,14 +38,14 @@ void getDioException(DioException error) {
   }
 }
 
-class WeatherError {
+class WeatherlyError {
   final num? code;
   final String? message;
 
-  WeatherError({required this.code, required this.message});
+  WeatherlyError({required this.code, required this.message});
 
-  factory WeatherError.fromJson(Map<String, dynamic> json) {
-    return WeatherError(
+  factory WeatherlyError.fromJson(Map<String, dynamic> json) {
+    return WeatherlyError(
       code: json['error']['code'].toInt(),
       message: json['error']['message'],
     );
@@ -65,16 +65,16 @@ class WeatherError {
     return 'WeatherError{code: $code, message: $message}';
   }
 
-  factory WeatherError.getError(Object e) {
+  factory WeatherlyError.getError(Object e) {
     if (e is ClientException) {
-      return WeatherError.fromJson(e.message);
+      return WeatherlyError.fromJson(e.message);
     } else if (e is ServerException) {
-      return WeatherError(
+      return WeatherlyError(
           code: -1,
           message:
               'Server is unreachable or you have a poor internet connection!!');
     } else {
-      return WeatherError(code: -2, message: e.toString());
+      return WeatherlyError(code: -2, message: e.toString());
     }
   }
 }

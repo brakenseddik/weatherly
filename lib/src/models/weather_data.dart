@@ -1,11 +1,11 @@
-class WeatherData {
+class WeatherlyData {
   Location? location;
   Current? current;
   Forecast? forecast;
 
-  WeatherData({forecast});
+  WeatherlyData({forecast});
 
-  WeatherData.fromJson(Map<String, dynamic> json) {
+  WeatherlyData.fromJson(Map<String, dynamic> json) {
     location =
         json['location'] != null ? Location.fromJson(json['location']) : null;
     current =
