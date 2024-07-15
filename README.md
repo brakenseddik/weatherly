@@ -1,41 +1,71 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Weatherly
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Weatherly is a Flutter package designed to fetch and display weather data from a specified endpoint. It provides a customizable widget that accepts a `Location` and `Date` as parameters to display the weather information.
 
 ## Features
 
 - Fetch weather data from an endpoint
-- Shows a widget that takes as a parameter [Location] and [Date]
+- Display a widget that shows weather details based on a provided `Location` and `Date`
+- Customizable styles and decorations for the widget
+- Supports fetching location suggestions
+- Handles error scenarios gracefully
 
-## Getting started
+## Getting Started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+### Prerequisites
 
-## Usage
+To use Weatherly, you need to have Flutter installed on your machine. For detailed instructions, visit the official [Flutter installation guide](https://flutter.dev/docs/get-started/install).
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+### Installation
 
-```dart
-const like = 'sample';
+Add the following dependency to your `pubspec.yaml` file:
+
+```yaml
+dependencies:
+  weatherly: ^1.0.0
 ```
+Then, run dart pub get to install the package.
 
-## Additional information
+### Basic Usage
+Here's a basic example of how to use the Weatherly package in your Flutter application.
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
-# weatherly
+Import the Package
+```
+import 'package:weatherly/weatherly.dart';
+```
+Then make this small widget
+
+```
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:weatherly/weatherly.dart';
+
+void main() {
+  WeatherlyConfig().initialize('ENTER_YOUR_KEY_HERE');
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+      appBar: AppBar(
+        title: const Text('Weather Search'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+               WeatherlyDetailsWidget(),      
+            ],
+          ),
+        ),
+      ),
+    )
+    );
+  }
+}
+
+```
