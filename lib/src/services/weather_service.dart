@@ -1,12 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:weatherly/src/constants.dart';
 import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/services/weather_config.dart';
-
-class WeatherApiError {}
 
 class WeatherApi {
   late Dio _dio;
@@ -17,10 +17,35 @@ class WeatherApi {
     _apiKey = WeatherlyConfig().apiKey;
   }
 
-  /// [getWeather] method fetches and get the weather data based on a geographical location and date
-  /// It accepts two parameters [String location] and [DateTime date]
-  /// Based on the selected date the fetched data can rbe for current date, past days of forecasting for future.
-  Future<WeatherData?> getWeather(String location, DateTime date) async {
+  /// Fetches the current weather data based on a geographical location (name or coordinates).
+  ///
+  /// [location] can be either a place name (String) or geo coordinates (latitude and longitude as String).
+  Future<WeatherData?> getCurrentWeather(double long, double lat) async {
+    try {
+      final response = await _dio.get(
+        '/current.json',
+        queryParameters: {
+          'key': _apiKey,
+          'q': '$lat,$long',
+        },
+      );
+      if (response.statusCode == HttpStatus.ok) {
+        return WeatherData.fromJson(response.data);
+      }
+    } on DioException catch (error) {
+      _getDioException(error);
+    } catch (error) {
+      throw UnknownException('Failed to get current weather data: $error');
+    }
+    return null;
+  }
+
+  /// Fetches weather data for a specific date based on a geographical location.
+  ///
+  /// [location] can be either a place name (String) or geo coordinates (latitude and longitude as String).
+  /// [date] is the date for which the weather data is requested.
+  Future<WeatherData?> getWeather(
+      double long, double lat, DateTime date) async {
     try {
       final String endpoint = _getEndpoint(date);
       final formatted = DateFormat('yyyy-MM-dd').format(date);
@@ -28,14 +53,12 @@ class WeatherApi {
         '/$endpoint.json',
         queryParameters: {
           'key': _apiKey,
-          'q': location,
+          'q': '$lat,$long',
           'dt': formatted,
         },
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == HttpStatus.ok) {
         return WeatherData.fromJson(response.data);
-      } else {
-        throw Exception('Failed to get weather data: ${response.statusCode}');
       }
     } on DioException catch (error) {
       _getDioException(error);
@@ -45,33 +68,45 @@ class WeatherApi {
     return null;
   }
 
-  /// This method is designed to classify the type of exception received
-  /// and it throws a custom exception with message to be catched in the UI
-  void _getDioException(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        throw TimeoutException(error.message);
-      case DioExceptionType.badCertificate:
-      case DioExceptionType.cancel:
-      case DioExceptionType.connectionError:
-        throw ServerException('Connection Exception:${error.message}');
-      case DioExceptionType.badResponse:
-        throw ClientException(error.response?.data);
-      case DioExceptionType.unknown:
-        throw UnknownException('Failed to get weather data: ${error.response}');
+  /// Fetches a weather forecast for a specific number of days (up to 10) based on a geographical location.
+  ///
+  /// [location] can be either a place name (String) or geo coordinates (latitude and longitude as String).
+  /// [days] is the number of days for which the forecast is requested (max: 10).
+  Future<WeatherData?> getForecast(double long, double lat, int days) async {
+    if (days > 10) {
+      throw ArgumentError('Forecast can only be fetched for up to 10 days.');
     }
-  }
 
-  ///[fetchSuggestions] helps the user to fetch the weather data for the right location
-  ///it takes a [String pattern] as an arg and return a list of suggestions.
-  Future<List<Location>> fetchSuggestions(String? city) async {
     try {
       final response = await _dio.get(
-          'http://api.weatherapi.com/v1/search.json',
-          queryParameters: {'key': _apiKey, 'q': city});
-      if (response.statusCode == 200) {
+        '/forecast.json',
+        queryParameters: {
+          'key': _apiKey,
+          'q': '$long,$lat',
+          'days': days,
+        },
+      );
+      if (response.statusCode == HttpStatus.ok) {
+        return WeatherData.fromJson(response.data);
+      }
+    } on DioException catch (error) {
+      _getDioException(error);
+    } catch (error) {
+      throw UnknownException('Failed to get forecast data: $error');
+    }
+    return null;
+  }
+
+  /// Fetches location suggestions based on a city name pattern.
+  ///
+  /// [query] is the name pattern for which suggestions are requested.
+  Future<List<Location>> fetchSuggestions(String? query) async {
+    try {
+      final response = await _dio.get(
+        'http://api.weatherapi.com/v1/search.json',
+        queryParameters: {'key': _apiKey, 'q': query},
+      );
+      if (response.statusCode == HttpStatus.ok) {
         List<Location> suggestions = (response.data as List)
             .map((data) => Location.fromJson(data))
             .toList();
@@ -82,14 +117,33 @@ class WeatherApi {
     } on DioException catch (error) {
       _getDioException(error);
     } catch (error) {
-      throw UnknownException('Failed to get weather data: $error');
+      throw UnknownException('Failed to get suggestions: $error');
     }
     return [];
   }
 
-  /// This method return the right api endpoint path based on the passed date
-  /// it takes a [DateTime] as an argument
-  /// There are three option [current], [history] and [future]
+  /// Classifies and throws custom exceptions based on DioException type.
+  void _getDioException(DioException error) {
+    log('exception is:$error');
+    switch (error.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        throw TimeoutException(error.message);
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.cancel:
+      case DioExceptionType.connectionError:
+        throw ServerException('Connection Exception: ${error.message}');
+      case DioExceptionType.badResponse:
+        throw ClientException(error.response?.data);
+      case DioExceptionType.unknown:
+        throw UnknownException('Failed to get weather data: ${error.response}');
+    }
+  }
+
+  /// Returns the appropriate API endpoint based on the date.
+  ///
+  /// [date] is the date for which the weather data is requested.
   String _getEndpoint(DateTime date) {
     final now = DateTime.now();
 

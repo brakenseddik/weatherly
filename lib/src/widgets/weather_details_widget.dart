@@ -56,6 +56,7 @@ class WeatherDetailsWidget extends StatefulWidget {
 class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
   late final TextEditingController _locationController;
   late final TextEditingController _dateController;
+  final _formKey = GlobalKey<FormState>();
 
   WeatherData? weatherInfo;
   WeatherError? weatherError;
@@ -84,7 +85,8 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              WeatherSearchBarWidget(
+              WeatherSearchForm(
+                  formKey: _formKey,
                   locationController: _locationController,
                   dateController: _dateController,
                   onLocationSelected: (Location suggestion) {
@@ -120,7 +122,7 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
                   onSubmit: (_selectedLocation == null || _selectedUnit == null)
                       ? null
                       : () => getWeather(
-                            _selectedLocation!.name!,
+                            _selectedLocation!,
                             _selectedDate ?? DateTime.now(),
                           )),
               ShowWeatherWidget(
@@ -165,9 +167,10 @@ class _WeatherDetailsWidgetState extends State<WeatherDetailsWidget> {
     return _suggestions;
   }
 
-  Future getWeather(String location, DateTime date) async {
+  Future getWeather(Location location, DateTime date) async {
     try {
-      final res = await _apiService.getWeather(location, date);
+      final res =
+          await _apiService.getWeather(location.lon!, location.lat!, date);
       setState(() {
         weatherInfo = res;
       });

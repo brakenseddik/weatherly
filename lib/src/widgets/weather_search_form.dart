@@ -6,7 +6,7 @@ import 'package:weatherly/src/widgets/form/unit_dropdown_field.dart';
 import 'package:weatherly/src/widgets/form/submit_button.dart';
 import 'package:weatherly/src/widgets/form/select_date_field.dart';
 
-class WeatherSearchBarWidget extends StatefulWidget {
+class WeatherSearchForm extends StatelessWidget {
   final Widget? submitButtonChild;
   final InputDecoration? searchFieldInputDecoration;
   final InputDecoration? dateInputDecoration;
@@ -20,8 +20,9 @@ class WeatherSearchBarWidget extends StatefulWidget {
   final void Function()? onSubmit;
   final TextEditingController dateController;
   final TextEditingController locationController;
+  final GlobalKey formKey;
 
-  WeatherSearchBarWidget({
+  const WeatherSearchForm({
     super.key,
     required this.dateController,
     required this.locationController,
@@ -36,47 +37,41 @@ class WeatherSearchBarWidget extends StatefulWidget {
     this.submitButtonStyle,
     this.spaceBetweenField,
     this.submitButtonChild,
+    required this.formKey,
   });
-
-  @override
-  State<WeatherSearchBarWidget> createState() => _WeatherSearchBarWidgetState();
-}
-
-class _WeatherSearchBarWidgetState extends State<WeatherSearchBarWidget> {
-  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
+      key: formKey,
       child: Column(
         children: [
           LocationSearchBar(
-              suggestionsCallback: widget.suggestionsCallback,
-              locationController: widget.locationController,
-              onLocationChanged: widget.onLocationChanged,
-              onLocationSelected: widget.onLocationSelected,
-              searchFieldInputDecoration: widget.searchFieldInputDecoration),
-          SizedBox(height: widget.spaceBetweenField ?? 16.0),
+              suggestionsCallback: suggestionsCallback,
+              locationController: locationController,
+              onLocationChanged: onLocationChanged,
+              onLocationSelected: onLocationSelected,
+              searchFieldInputDecoration: searchFieldInputDecoration),
+          SizedBox(height: spaceBetweenField ?? 16.0),
           Row(
             children: [
               WeatherDatePickerField(
-                dateController: widget.dateController,
-                onDateTapped: widget.onDateTapped,
-                dateInputDecoration: widget.dateInputDecoration,
+                dateController: dateController,
+                onDateTapped: onDateTapped,
+                dateInputDecoration: dateInputDecoration,
               ),
-              SizedBox(width: widget.spaceBetweenField ?? 16.0),
+              SizedBox(width: spaceBetweenField ?? 16.0),
               UnitsDropDownField(
-                onUnitChanged: widget.onUnitChanged,
-                dateInputDecoration: widget.dateInputDecoration,
+                onUnitChanged: onUnitChanged,
+                dateInputDecoration: dateInputDecoration,
               ),
             ],
           ),
-          SizedBox(height: widget.spaceBetweenField ?? 16.0),
+          SizedBox(height: spaceBetweenField ?? 16.0),
           SubmitFormButton(
-            onSubmit: widget.onSubmit,
-            submitButtonStyle: widget.submitButtonStyle,
-            submitButtonChild: widget.submitButtonChild ?? const Text('Submit'),
+            onSubmit: onSubmit,
+            submitButtonStyle: submitButtonStyle,
+            submitButtonChild: submitButtonChild,
           ),
         ],
       ),

@@ -24,14 +24,7 @@ class SubmitFormButton extends StatelessWidget {
               )),
             ),
         onPressed: onSubmit,
-        child: submitButtonChild ??
-            const Text(
-              'Get Weather',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        child: submitButtonChild ?? const Text('Get Weather'),
       ),
     );
   }
