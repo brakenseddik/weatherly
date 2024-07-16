@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:weatherly/src/models/temperature_unit.dart';
+import 'package:weatherly/src/services/weather_config.dart';
 
 class UnitsDropDownField extends StatelessWidget {
   const UnitsDropDownField({
@@ -18,6 +19,7 @@ class UnitsDropDownField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: DropdownButtonFormField<TemperatureUnit>(
+        value: WeatherlyConfig().temperatureUnit,
         decoration: dateInputDecoration ??
             const InputDecoration(
               labelText: 'Unit',

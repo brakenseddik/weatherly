@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weatherly/weatherly.dart';
 
 void main() {
-  WeatherlyConfig().initialize('ENTER_YOUR_KEY_HERE');
+  WeatherlyConfig().initialize('ENTER_YOUR_API_KEY');
   runApp(const MyApp());
 }
 
@@ -31,6 +31,7 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.amber,
         title: const Text('Weather Search'),
       ),
       body: Padding(
@@ -38,7 +39,22 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const WeatherlyDetailsWidget(),
+              WeatherlyDetailsWidget(
+                submitButtonStyle: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                ),
+                dateStyle: const TextStyle(
+                  fontSize: 18,
+                ),
+                temperatureStyle: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+                conditionStyle: const TextStyle(
+                  fontSize: 16,
+                ),
+                containerColor: Colors.grey[200],
+              ),
               SizedBox(
                 width: 350,
                 child: ElevatedButton(

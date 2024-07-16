@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:weatherly/src/models/temperature_unit.dart';
 import 'package:weatherly/src/services/utils.dart';
-import 'package:weatherly/src/services/weather_config.dart';
+import 'package:weatherly/src/services/weather_state.dart';
 import 'package:weatherly/src/widgets/weather_card.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/widgets/weather_search_form.dart';
 import 'package:weatherly/src/services/weather_service.dart';
 
-class WeatherlyDetailsWidget extends StatefulWidget {
+class WeatherlyDetailsWidget extends StatelessWidget {
   const WeatherlyDetailsWidget({
     super.key,
     this.searchFieldInputDecoration,
@@ -33,7 +33,7 @@ class WeatherlyDetailsWidget extends StatefulWidget {
   /// InputDecoration for the date input text field
   final InputDecoration? dateInputDecoration;
 
-  /// defines the style for the submit button
+  /// Defines the button style for the submit button
   final ButtonStyle? submitButtonStyle;
 
   /// Datetime text style
@@ -67,134 +67,79 @@ class WeatherlyDetailsWidget extends StatefulWidget {
   final Function(WeatherlyError)? onError;
 
   @override
-  State<WeatherlyDetailsWidget> createState() => _WeatherlyDetailsWidgetState();
-}
-
-class _WeatherlyDetailsWidgetState extends State<WeatherlyDetailsWidget> {
-  late final TextEditingController _locationController;
-  late final TextEditingController _dateController;
-  final _formKey = GlobalKey<FormState>();
-
-  WeatherlyData? weatherInfo;
-  WeatherlyError? weatherError;
-  late WeatherlyService _apiService;
-
-  DateTime? _selectedDate;
-  Location? _selectedLocation;
-  TemperatureUnit _selectedUnit = WeatherlyConfig().temperatureUnit;
-
-  @override
-  void initState() {
-    super.initState();
-    _apiService = WeatherlyService();
-    _locationController = TextEditingController();
-    _dateController = TextEditingController();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              WeatherSearchForm(
-                  formKey: _formKey,
-                  locationController: _locationController,
-                  dateController: _dateController,
-                  searchTileLeading: widget.searchTileLeading,
-                  onLocationSelected: (Location suggestion) {
-                    setState(() {
-                      _locationController.text = suggestion.name ?? '';
-                      _selectedLocation = suggestion;
-                    });
-                  },
-                  onLocationChanged: (String? pattern) {
-                    setState(() {
-                      _selectedLocation = null;
-                    });
-                  },
-                  suggestionsCallback: (String pattern) async {
-                    return _fetchSuggestions(pattern);
-                  },
-                  onDateTapped: () async {
-                    final pickedDate = await showDatePickerDialog(context);
-                    if (pickedDate != null && pickedDate != _selectedDate) {
-                      setState(() {
-                        _dateController.text =
-                            DateFormat('yyyy-MM-dd').format(pickedDate);
-                        _selectedDate = pickedDate;
-                      });
-                    }
-                  },
-                  onUnitChanged: (TemperatureUnit? unit) {
-                    setState(() {
-                      _selectedUnit = unit!;
-                    });
-                  },
-                  onSubmit: (_selectedLocation == null || _selectedUnit == null)
-                      ? null
-                      : () => getWeather(
-                            _selectedLocation!,
-                            _selectedDate ?? DateTime.now(),
-                          )),
-              ShowWeatherWidget(
-                weatherInfo: weatherInfo,
-                weatherError: weatherError,
-                dateStyle: widget.dateStyle,
-                temperatureStyle: widget.temperatureStyle,
-                conditionStyle: widget.conditionStyle,
-                containerColor: widget.containerColor,
-                padding: widget.padding,
-                iconSize: widget.iconSize,
-                borderRadius: widget.borderRadius,
-                temperatureUnit: _selectedUnit,
+    return ChangeNotifierProvider(
+      create: (_) => WeatherState(WeatherlyService()),
+      child: Consumer<WeatherState>(builder: (context, provider, widget) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (provider.weatherError != null) {
+            onError ?? displayError(context, provider.weatherError);
+            provider.clearError();
+          }
+        });
+
+        return Card(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  WeatherSearchForm(
+                    formKey: provider.formKey,
+                    locationController: provider.locationController,
+                    dateController: provider.dateController,
+                    searchTileLeading: searchTileLeading,
+                    submitButtonStyle: submitButtonStyle,
+                    onLocationSelected: (Location suggestion) =>
+                        provider.seSuggestedLocation(suggestion),
+                    suggestionsCallback: (String pattern) async =>
+                        provider.fetchSuggestions(pattern),
+                    onDateTapped: () async {
+                      final pickedDate = await showDatePickerDialog(context);
+                      if (pickedDate != null) {
+                        provider.setSelectedDate(pickedDate);
+                      }
+                    },
+                    onUnitChanged: (TemperatureUnit? unit) =>
+                        provider.seTemperatureUnit(unit!),
+                    onSubmit: (provider.selectedLocation == null)
+                        ? null
+                        : () {
+                            provider.getWeather(
+                              provider.selectedLocation!,
+                              provider.selectedDate ?? DateTime.now(),
+                            );
+                          },
+                  ),
+                  ShowWeatherWidget(
+                    weatherInfo: provider.weatherlyData,
+                    weatherError: provider.weatherError,
+                    dateStyle: dateStyle,
+                    temperatureStyle: temperatureStyle,
+                    conditionStyle: conditionStyle,
+                    containerColor: containerColor,
+                    padding: padding,
+                    iconSize: iconSize,
+                    borderRadius: borderRadius,
+                    temperatureUnit: provider.selectedUnit,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
-  Future<List<Location>> _fetchSuggestions(String pattern) async {
-    if (pattern.isNotEmpty) {
-      try {
-        return await _apiService.fetchSuggestions(pattern);
-      } catch (e) {
-        widget.onError ?? displayError(WeatherlyError.getError(e));
-        return [];
-      }
-    }
-    return [];
-  }
-
-  Future getWeather(Location location, DateTime date) async {
-    try {
-      final res =
-          await _apiService.getWeather(location.lon!, location.lat!, date);
-      setState(() {
-        weatherInfo = res;
-      });
-    } catch (e) {
-      widget.onError ?? displayError(WeatherlyError.getError(e));
-    }
-  }
-
-  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> displayError(
-      WeatherlyError? weatherError) {
+  displayError(
+    BuildContext context,
+    WeatherlyError? weatherError,
+  ) {
     return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.redAccent,
         content: Text(weatherError?.message ?? 'Something went wrong!!')));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _dateController.clear();
-    _locationController.clear();
   }
 }
