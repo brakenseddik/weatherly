@@ -22,8 +22,10 @@ void main() {
     mockDio = MockDio();
     mockWeatherlyConfig = MockWeatherlyConfig();
     when(() => mockWeatherlyConfig.apiKey).thenReturn('mock_api_key');
-    weatherlyService =
-        WeatherlyService(dio: mockDio, weatherlyConfig: mockWeatherlyConfig);
+    weatherlyService = WeatherlyService(
+      dio: mockDio,
+      weatherlyConfig: mockWeatherlyConfig,
+    );
   });
 
   group('Weatherly Service tests', () {
@@ -45,10 +47,9 @@ void main() {
         ),
       );
 
-      final weatherData =
-          await weatherlyService.getCurrentWeather(longitude, latitude);
+      final res = await weatherlyService.getCurrentWeather(longitude, latitude);
 
-      expect(weatherData, isA<WeatherlyData?>());
+      expect(res, isA<WeatherlyData?>());
     });
 
     test('fetches weather data for a specific date successfully', () async {
@@ -70,7 +71,19 @@ void main() {
 
       expect(weatherData, isA<WeatherlyData>());
     });
-
+    test('fetches current weather with invalid coordinates', () async {
+      when(() => mockDio.get(any(),
+              queryParameters: any(named: 'queryParameters')))
+          .thenThrow(DioException(
+              requestOptions: RequestOptions(path: ''),
+              type: DioExceptionType.badResponse,
+              error: dummyClientError));
+      try {
+        await weatherlyService.getCurrentWeather(0.0, 0.0);
+      } catch (e) {
+        expect(e, isA<ClientException>());
+      }
+    });
     test('fetches forecast data successfully', () async {
       const days = 5;
       when(() => mockDio.get(any(),
@@ -91,6 +104,40 @@ void main() {
       expect(weatherData, isA<WeatherlyData>());
     });
 
+    test('fetches weather data for a future date', () async {
+      final date = DateTime.now().add(const Duration(days: 5));
+      when(() => mockDio.get(any(),
+              queryParameters: any(named: 'queryParameters')))
+          .thenAnswer((_) async => Response(
+                data: dummyWeatherJsonResponse,
+                statusCode: HttpStatus.ok,
+                requestOptions: RequestOptions(path: ''),
+              ));
+
+      final weatherData =
+          await weatherlyService.getWeather(longitude, latitude, date);
+
+      expect(weatherData, isA<WeatherlyData>());
+    });
+    test('fetches weather forecast for maximum days', () async {
+      const maxDays = 10;
+      when(() => mockDio.get(any(),
+              queryParameters: any(named: 'queryParameters')))
+          .thenAnswer((_) async => Response(
+                data: dummyWeatherJsonResponse,
+                statusCode: HttpStatus.ok,
+                requestOptions: RequestOptions(path: ''),
+              ));
+
+      final weatherData = await weatherlyService.getForecast(
+        longitude,
+        latitude,
+        maxDays,
+      );
+
+      expect(weatherData, isA<WeatherlyData>());
+    });
+
     test('fetches location suggestions successfully', () async {
       when(() => mockDio.get(any(),
               queryParameters: any(named: 'queryParameters')))
@@ -105,22 +152,37 @@ void main() {
       expect(suggestions, isA<List<Location>>());
       expect(suggestions.length, greaterThan(0));
     });
-
-    test('handles DioException properly', () async {
+    test('fetches location suggestions with empty query', () async {
       when(() => mockDio.get(any(),
               queryParameters: any(named: 'queryParameters')))
-          .thenThrow(DioException(
+          .thenAnswer((_) async => Response(
+                data: [],
+                statusCode: HttpStatus.ok,
+                requestOptions: RequestOptions(path: ''),
+              ));
+
+      final suggestions = await weatherlyService.fetchSuggestions('');
+      expect(suggestions, isEmpty);
+    });
+
+    test('handles DioException properly', () async {
+      when(
+        () => mockDio.get(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+        ),
+      ).thenThrow(DioException(
         requestOptions: RequestOptions(path: ''),
         type: DioExceptionType.badResponse,
         error: 'Some Dio error',
       ));
 
       expect(
-        () async =>
-            await weatherlyService.getCurrentWeather(longitude, latitude),
-        throwsA(
-          isA<ClientException>(),
+        () async => await weatherlyService.getCurrentWeather(
+          longitude,
+          latitude,
         ),
+        throwsA(isA<ClientException>()),
       );
     });
   });

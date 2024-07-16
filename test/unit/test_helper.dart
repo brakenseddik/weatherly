@@ -1050,3 +1050,7 @@ final dummySuggestions = [
     "url": "londonderry-new-hampshire-united-states-of-america"
   }
 ];
+
+final dummyClientError = {
+  "error": {"code": 1006, "message": "No matching location found."}
+};
