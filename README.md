@@ -31,7 +31,7 @@ Then, run dart pub get to install the package.
 
 ### Basic Usage
 Here's a basic example of how to use the Weatherly package in your Flutter application.
-Use [WeatherAPI](https://www.weatherapi.com/ to generate a free API Key
+Use [WeatherAPI](https://www.weatherapi.com/) to generate a free API Key
 
 Import the Package
 ```
