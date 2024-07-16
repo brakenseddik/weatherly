@@ -25,9 +25,11 @@ class SubmitFormButton extends StatelessWidget {
         style: submitButtonStyle ??
             ButtonStyle(
               backgroundColor: WidgetStateProperty.all(Colors.amber),
-              shape: WidgetStateProperty.all(RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              )),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
             ),
         onPressed: onSubmit,
         child: submitButtonChild ?? const Text('Get Weather'),

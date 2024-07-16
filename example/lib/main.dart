@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:weatherly/weatherly.dart';
 
 void main() {
-  WeatherlyConfig().initialize('9270c145786e45c0ab3141941241307');
+  WeatherlyConfig().initialize(
+    'ENTER_YOUR_API_KEY_HERE',
+    tempUnit: TemperatureUnit.celsius,
+  );
   runApp(const MyApp());
 }
 
@@ -44,14 +47,14 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
                   backgroundColor: Colors.blue,
                 ),
                 dateStyle: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 28,
                 ),
                 temperatureStyle: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 48,
                   fontWeight: FontWeight.bold,
                 ),
                 conditionStyle: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 22,
                 ),
                 containerColor: Colors.grey[200],
               ),

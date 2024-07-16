@@ -17,13 +17,9 @@ class SuggestionListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: leading ??
-          const Icon(
-            Icons.location_on_outlined,
-            color: Colors.amber,
-          ),
-      title: Text(suggestion.name ?? ''),
-      subtitle: Text(suggestion.country ?? ''),
-    );
+        leading: leading ??
+            const Icon(Icons.location_on_outlined, color: Colors.amber),
+        title: Text(suggestion.name ?? ''),
+        subtitle: Text(suggestion.country ?? ''));
   }
 }

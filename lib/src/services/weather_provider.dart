@@ -7,20 +7,21 @@ import 'package:weatherly/src/services/weather_config.dart';
 import 'package:weatherly/src/services/weather_service.dart';
 
 class WeatherProvider extends ChangeNotifier {
+  final WeatherlyService _apiService;
   WeatherProvider(this._apiService);
+
   final TextEditingController locationController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   WeatherlyData? weatherlyData;
   WeatherlyError? weatherError;
-  final WeatherlyService _apiService;
 
   DateTime? selectedDate;
   Location? selectedLocation;
   TemperatureUnit selectedUnit = WeatherlyConfig().temperatureUnit;
 
-  setWeatherData(WeatherlyData? data) {
+  void setWeatherData(WeatherlyData? data) {
     weatherlyData = data;
     notifyListeners();
   }
@@ -30,20 +31,20 @@ class WeatherProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  setWeatherError(WeatherlyError error) {
+  void setWeatherError(WeatherlyError error) {
     weatherError = error;
     notifyListeners();
   }
 
-  seSuggestedLocation(Location? suggestion) {
+  void seSuggestedLocation(Location? suggestion) {
     selectedLocation = suggestion;
     locationController.text = suggestion?.name ?? '';
     notifyListeners();
   }
 
   setSelectedDate(DateTime pickedDate) {
-    dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
     selectedDate = pickedDate;
+    dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
     notifyListeners();
   }
 

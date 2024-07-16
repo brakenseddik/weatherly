@@ -20,8 +20,6 @@ import 'package:weatherly/src/services/weather_config.dart';
 /// // Fetch weather information
 /// WeatherlyData weatherData = await weatherService.getWeather(lon, lat, date);
 ///
-/// // Fetch location suggestions
-/// List<Location> suggestions = await weatherService.fetchSuggestions(query);
 /// ```
 class WeatherlyService {
   ///[Dio] handles http requests with the weather api endpoint
@@ -32,9 +30,10 @@ class WeatherlyService {
   WeatherlyService({Dio? dio, WeatherlyConfig? weatherlyConfig}) {
     _dio = dio ??
         Dio(BaseOptions(
-            baseUrl: 'http://api.weatherapi.com/v1',
-            connectTimeout: const Duration(seconds: 10),
-            sendTimeout: const Duration(seconds: 5)));
+          baseUrl: 'http://api.weatherapi.com/v1',
+          connectTimeout: const Duration(seconds: 10),
+          sendTimeout: const Duration(seconds: 5),
+        ));
     _apiKey = weatherlyConfig?.apiKey ?? WeatherlyConfig().apiKey;
   }
 
@@ -63,9 +62,9 @@ class WeatherlyService {
 
   /// Fetches weather data for a specific date based on a geographical location.
   ///
-  /// [location] isa  geo coordinates (latitude and longitude as String).
+  /// [location] is a  geo coordinates (latitude and longitude as String).
   /// [date] is the date for which the weather data is requested.
-  /// It can be for [current], [historical] or [future] forecast.
+  /// It can be for [current], [historical] or [future] for forecast.
   Future<WeatherlyData?> getWeather(
       double long, double lat, DateTime date) async {
     try {
@@ -92,13 +91,12 @@ class WeatherlyService {
 
   /// Fetches a weather forecast for a specific number of days (up to 10) based on a geographical location.
   ///
-  /// [location] ia s geo coordinates (latitude and longitude as String).
+  /// [location] ia s geo coordinates (latitude and longitude).
   /// [days] is the number of days for which the forecast is requested (max: 10).
   Future<WeatherlyData?> getForecast(double long, double lat, int days) async {
     if (days > 10) {
       throw ArgumentError('Forecast can only be fetched for up to 10 days.');
     }
-
     try {
       final response = await _dio.get(
         '/forecast.json',

@@ -46,8 +46,9 @@ class LocationSearchBar extends StatelessWidget {
                 hintText: 'Please enter a location',
                 fillColor: Colors.white,
                 filled: true,
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
               ),
         );
       },

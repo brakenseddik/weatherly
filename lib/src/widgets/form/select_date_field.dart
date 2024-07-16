@@ -21,16 +21,17 @@ class WeatherDatePickerField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: TextFormField(
-          controller: _dateController,
-          decoration: dateInputDecoration ??
-              const InputDecoration(
-                labelText: 'Date',
-                border: OutlineInputBorder(),
-                fillColor: Colors.white,
-                filled: true,
-              ),
-          readOnly: true,
-          onTap: onDateTapped),
+        controller: _dateController,
+        decoration: dateInputDecoration ??
+            const InputDecoration(
+              labelText: 'Date',
+              border: OutlineInputBorder(),
+              fillColor: Colors.white,
+              filled: true,
+            ),
+        readOnly: true,
+        onTap: onDateTapped,
+      ),
     );
   }
 }

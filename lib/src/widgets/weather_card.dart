@@ -4,11 +4,38 @@ import 'package:weatherly/src/models/temperature_unit.dart';
 import 'package:weatherly/src/models/weather_data.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 
+/// A widget that displays weather information based on the provided data.
+///
+/// The [ShowWeatherWidget] takes weather data, styles, and other
+/// customization options to display weather details in a user-friendly way.
+///
+/// ```dart
+/// ShowWeatherWidget(
+///   weatherInfo: weatherInfo,
+///   weatherError: weatherError,
+///   dateStyle: TextStyle(
+///     fontSize: 16,
+///     color: Colors.black,
+///   ),
+///   temperatureStyle: TextStyle(
+///     fontSize: 24,
+///     color: Colors.red,
+///   ),
+///   conditionStyle: TextStyle(
+///     fontSize: 20,
+///     color: Colors.grey,
+///   ),
+///   containerColor: Colors.white,
+///   padding: EdgeInsets.all(16),
+///   iconSize: 48,
+///   borderRadius: BorderRadius.circular(12),
+/// )
+/// ```
+///
 class ShowWeatherWidget extends StatelessWidget {
   const ShowWeatherWidget({
     super.key,
-    this.weatherInfo,
-    this.weatherError,
+    this.weatherlyData,
     this.dateStyle,
     this.temperatureStyle,
     this.conditionStyle,
@@ -17,13 +44,12 @@ class ShowWeatherWidget extends StatelessWidget {
     this.iconSize,
     this.borderRadius,
     this.temperatureUnit,
+    this.height,
+    this.width,
   });
 
   /// Holds weather information data fetched from an weather service.
-  final WeatherlyData? weatherInfo;
-
-  /// Represents an error that occurred while fetching weather information.
-  final WeatherlyError? weatherError;
+  final WeatherlyData? weatherlyData;
 
   /// Defines the text style for displaying dates in the weather details widget.
   final TextStyle? dateStyle;
@@ -49,85 +75,93 @@ class ShowWeatherWidget extends StatelessWidget {
   /// Represents the unit used for displaying temperatures (e.g., Celsius or Fahrenheit).
   final TemperatureUnit? temperatureUnit;
 
+  /// Defines the height for the weather details widget.
+  final double? height;
+
+  /// Defines the width for the weather details widget.
+  final double? width;
+
   @override
   Widget build(BuildContext context) {
-    if (weatherError != null || weatherInfo == null) {
-      return const SizedBox.shrink();
-    }
-
     final date = _getDate();
     final temperature = _getTemperature();
     final condition = _getCondition();
     final iconUrl = _getIconUrl();
 
     return Container(
-      height: 260,
+      height: height ?? 260,
       margin: const EdgeInsets.only(top: 16),
-      width: 450,
+      width: width ?? 450,
       padding: padding ?? const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-          borderRadius: borderRadius ?? BorderRadius.circular(6),
-          color: containerColor ?? Colors.white,
-          boxShadow: const [BoxShadow(blurRadius: 0.8, spreadRadius: 0.7)]),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            DateFormat('yyyy-MM-dd').format(date),
-            style: dateStyle ??
-                const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-          ),
-          if (iconUrl != null)
-            Image.network(
-              iconUrl,
-              height: iconSize ?? 100,
+        borderRadius: borderRadius ?? BorderRadius.circular(6),
+        color: containerColor ?? Colors.white,
+        boxShadow: const [BoxShadow(blurRadius: 0.8, spreadRadius: 0.7)],
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              DateFormat('yyyy-MM-dd').format(date),
+              style: dateStyle ??
+                  const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
-          Text(
-            temperature != null
-                ? temperatureUnit == TemperatureUnit.fahrenheit
-                    ? '$temperature°F'
-                    : '$temperature°C'
-                : 'N/A',
-            style: temperatureStyle ??
-                const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            condition ?? 'N/A',
-            style: conditionStyle ?? const TextStyle(fontSize: 18),
-          ),
-        ],
+            if (iconUrl != null)
+              Image.network(
+                iconUrl,
+                height: iconSize ?? 100,
+              ),
+            Text(
+              temperature != null
+                  ? temperatureUnit == TemperatureUnit.fahrenheit
+                      ? '$temperature°F'
+                      : '$temperature°C'
+                  : 'N/A',
+              style: temperatureStyle ??
+                  const TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            Text(
+              condition ?? 'N/A',
+              style: conditionStyle ?? const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   DateTime _getDate() {
-    final forecastDate = weatherInfo?.forecast?.forecastday?.first.date;
-    final currentDate = weatherInfo?.current?.lastUpdated;
+    final forecastDate = weatherlyData?.forecast?.forecastday?.first.date;
+    final currentDate = weatherlyData?.current?.lastUpdated;
     return DateTime.tryParse(forecastDate ?? currentDate ?? '') ??
         DateTime.now();
   }
 
   String? _getTemperature() {
     final forecastTemp = temperatureUnit == TemperatureUnit.fahrenheit
-        ? weatherInfo?.forecast?.forecastday?.first.day?.avgtempF
-        : weatherInfo?.forecast?.forecastday?.first.day?.avgtempC;
+        ? weatherlyData?.forecast?.forecastday?.first.day?.avgtempF
+        : weatherlyData?.forecast?.forecastday?.first.day?.avgtempC;
     final currentTemp = temperatureUnit == TemperatureUnit.fahrenheit
-        ? weatherInfo?.current?.tempF
-        : weatherInfo?.current?.tempC;
+        ? weatherlyData?.current?.tempF
+        : weatherlyData?.current?.tempC;
     return (forecastTemp ?? currentTemp)?.toString();
   }
 
   String? _getCondition() {
     final forecastCondition =
-        weatherInfo?.forecast?.forecastday?.first.day?.condition?.text;
-    final currentCondition = weatherInfo?.current?.condition?.text;
+        weatherlyData?.forecast?.forecastday?.first.day?.condition?.text;
+    final currentCondition = weatherlyData?.current?.condition?.text;
     return forecastCondition ?? currentCondition;
   }
 
   String? _getIconUrl() {
     final forecastIcon =
-        weatherInfo?.forecast?.forecastday?.first.day?.condition?.icon;
-    final currentIcon = weatherInfo?.current?.condition?.icon;
+        weatherlyData?.forecast?.forecastday?.first.day?.condition?.icon;
+    final currentIcon = weatherlyData?.current?.condition?.icon;
     final icon = forecastIcon ?? currentIcon;
     return icon != null ? 'http:$icon' : null;
   }

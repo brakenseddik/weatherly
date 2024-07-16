@@ -1,9 +1,22 @@
 import 'package:weatherly/src/models/temperature_unit.dart';
 
-/// This class represents the weather service configuration
+/// Configuration settings for the Weatherly package.
 ///
-/// It has one method to initialise the API key which this later is needed to perform http calls.
-
+/// The [WeatherlyConfig] class provides a centralized place for managing
+/// configuration settings used throughout the Weatherly package. These
+/// settings include the default temperature unit and API key.
+///
+/// Example usage:
+/// ```dart
+/// void main() {
+///   WeatherlyConfig().initialize(
+///     'API_KEY',
+///     tempUnit: TemperatureUnit.celsius,
+///   );
+///   runApp(const MyApp());
+/// }
+/// ```
+///
 class WeatherlyConfig {
   static final WeatherlyConfig _singleton = WeatherlyConfig._internal();
 

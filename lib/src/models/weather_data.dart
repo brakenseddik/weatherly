@@ -1,3 +1,9 @@
+/// A model representing the weather data coming from the API.
+///
+/// The [WeatherlyData] class holds information about the weather,
+/// such as temperature, weather condition, location and many other details.
+/// It has other factory constructor like [WeatherlyData.fromJson()] to convert
+/// the actual json response into a data model.
 class WeatherlyData {
   Location? location;
   Current? current;
