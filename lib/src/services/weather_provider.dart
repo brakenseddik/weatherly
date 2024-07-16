@@ -6,8 +6,8 @@ import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/services/weather_config.dart';
 import 'package:weatherly/src/services/weather_service.dart';
 
-class WeatherState extends ChangeNotifier {
-  WeatherState(this._apiService);
+class WeatherProvider extends ChangeNotifier {
+  WeatherProvider(this._apiService);
   final TextEditingController locationController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -52,28 +52,19 @@ class WeatherState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Location>> fetchSuggestions(
-    String pattern,
-    // Function(WeatherlyError)? onError,
-  ) async {
+  Future<List<Location>> fetchSuggestions(String pattern) async {
     if (pattern.isNotEmpty) {
       try {
-        final suggestions = await _apiService.fetchSuggestions(pattern);
-        notifyListeners(); // Ensure state updates
-        return suggestions;
+        return await _apiService.fetchSuggestions(pattern);
       } catch (e) {
         setWeatherError(WeatherlyError.getError(e));
-        // onError;
         return [];
       }
     }
     return [];
   }
 
-  Future getWeather(
-    Location location,
-    DateTime date,
-  ) async {
+  Future getWeather(Location location, DateTime date) async {
     try {
       final res = await _apiService.getWeather(
         location.lon!,
@@ -83,8 +74,6 @@ class WeatherState extends ChangeNotifier {
       setWeatherData(res);
     } catch (e) {
       setWeatherError(WeatherlyError.getError(e));
-
-      // onError;
     }
   }
 }

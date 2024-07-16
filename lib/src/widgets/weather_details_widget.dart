@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weatherly/src/models/temperature_unit.dart';
 import 'package:weatherly/src/services/utils.dart';
-import 'package:weatherly/src/services/weather_state.dart';
+import 'package:weatherly/src/services/weather_provider.dart';
 import 'package:weatherly/src/widgets/weather_card.dart';
 import 'package:weatherly/src/models/weather_error.dart';
 import 'package:weatherly/src/models/weather_data.dart';
@@ -69,11 +69,11 @@ class WeatherlyDetailsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => WeatherState(WeatherlyService()),
-      child: Consumer<WeatherState>(builder: (context, provider, widget) {
+      create: (_) => WeatherProvider(WeatherlyService()),
+      child: Consumer<WeatherProvider>(builder: (context, provider, widget) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (provider.weatherError != null) {
-            onError ?? displayError(context, provider.weatherError);
+            onError ?? Utils.showError(context, provider.weatherError!);
             provider.clearError();
           }
         });
@@ -97,7 +97,8 @@ class WeatherlyDetailsWidget extends StatelessWidget {
                     suggestionsCallback: (String pattern) async =>
                         provider.fetchSuggestions(pattern),
                     onDateTapped: () async {
-                      final pickedDate = await showDatePickerDialog(context);
+                      final pickedDate =
+                          await Utils.showDatePickerDialog(context);
                       if (pickedDate != null) {
                         provider.setSelectedDate(pickedDate);
                       }
@@ -132,14 +133,5 @@ class WeatherlyDetailsWidget extends StatelessWidget {
         );
       }),
     );
-  }
-
-  displayError(
-    BuildContext context,
-    WeatherlyError? weatherError,
-  ) {
-    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.redAccent,
-        content: Text(weatherError?.message ?? 'Something went wrong!!')));
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weatherly/weatherly.dart';
 
 void main() {
-  WeatherlyConfig().initialize('ENTER_YOUR_API_KEY');
+  WeatherlyConfig().initialize('9270c145786e45c0ab3141941241307');
   runApp(const MyApp());
 }
 
