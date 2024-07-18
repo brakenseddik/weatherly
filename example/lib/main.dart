@@ -57,6 +57,12 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
                   fontSize: 22,
                 ),
                 containerColor: Colors.grey[200],
+                onError: (WeatherlyError error) {
+                  print("onError: $error");
+                },
+              ),
+              const SizedBox(
+                height: 16,
               ),
               SizedBox(
                 width: 350,
@@ -67,6 +73,9 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
                       print("weatherData: $weatherData");
                     },
                     child: const Text('Get forecast')),
+              ),
+              const SizedBox(
+                height: 16,
               ),
               SizedBox(
                 width: 350,
